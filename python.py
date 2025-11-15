@@ -1,34 +1,34 @@
-from fastapi import FastAPI, Request, HTTPException
-import httpx
+from flask import Flask, request, jsonify
+import requests
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from werkzeug.serving import run_simple
 
-app = FastAPI()
+app = Flask(__name__)
 
 NEW_API_URL = "https://mengtopup.shop/api/check_payment?md5={md5}"
 
 
 @app.get("/check!payment")
-async def check_payment(md5: str | None = None):
-    if not md5:
-        raise HTTPException(status_code=400, detail="md5 parameter is required")
-
-    target_url = NEW_API_URL.format(md5=md5)
+def check_payment():
+    target_url = f"{NEW_API_URL}"
 
     try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(target_url)
-            return response.json()
+        response = requests.get(target_url)
+        return jsonify(response.json())
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return jsonify({"success": False, "error": str(e)})
 
 
 @app.get("/dev")
-async def dev():
-    return {"dev": "made@by@panha"}
+def dev():
+    return jsonify({"dev": "made@by@panha"})
 
 
 @app.get("/infor")
-async def infor():
-    return {"infor": "trueid26"}
+def infor():
+    return jsonify({"infor": "trueid26"})
 
 
-# Run with: uvicorn main:app --host 0.0.0.0 --port 8000
+# Vercel requires `app` to be named `app`
+# This line exposes Flask app to Vercel serverless
+app = app
