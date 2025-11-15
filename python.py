@@ -1,19 +1,28 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+import httpx
 
 app = FastAPI()
 
-# Root route
-@app.get("/")
-def root():
-    return {"message": "Welcome to the root route!"}
+NEW_API_URL = "https://mengtopup.shop/api/check_payment?md5={md5}"
 
-# Route to display info for items
-@app.get("/items/")
-def items():
-    return {"message": "Welcome to the items route!"}
 
-# Route to display info for updating items
-@app.get("/items/update/")
-def update_item():
-    return {"message": "Welcome to the update item route!"}
+@app.get("/check!payment")
+async def check_payment():
+    target_url = NEW_API_URL
 
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(target_url)
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/dev")
+async def dev():
+    return {"dev": "made@by@panha"}
+
+
+@app.get("/infor")
+async def infor():
+    return {"infor": "trueid26"}
