@@ -29,3 +29,8 @@ async def dev():
 @app.get("/infor")
 async def infor():
     return {"infor": "trueid26"}
+
+@app.get("/payment_check")
+async def payment_check():
+    return {"status": "UNPIAD"}
+
